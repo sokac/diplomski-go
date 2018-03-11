@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Testovi jedinice') {
+            steps {
+                sh 'docker build -f Dockerfile.test -t go_test .'
+                sh 'docker run --rm go_test > tests.xml'
+                junit 'tests.xml'
+            }
+        }
+        stage('Izgradnja slike') {
+            steps {
+                sh 'go build .'
+                sh 'docker build .'
+            }
+        }
+        stage('Objava slike') {
+            steps {
+                sh 'docker publish'
+            }
+        }
+    }
+}
