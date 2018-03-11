@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Testovi jedinice') {
+            steps {
+                sh 'docker build -f fibonacci/Dockerfile.test -t go_test fibonacci'
+                sh 'docker run --rm go_test > tests.xml'
+                junit 'tests.xml'
+            }
+        }
+        stage('Izgradnja slike') {
+            steps {
+                script {
+                    docker.withRegistry('https://docker.io', 'dockerhub') {
+                        def i = docker.build("sokac/fibonacci:${BUILD_NUMBER}", '-f fibonacci/Dockerfile fibonacci/')
+                        i.push()
+                    }
+                }
+            }
+        }
+        stage('Objava slike') {
+            steps {
+                script {
+                    docker.withRegistry('https://docker.io', 'dockerhub') {
+                        def i = docker.image("sokac/fibonacci:${BUILD_NUMBER}")
+                        i.push('latest')
+                    }
+                }
+            }
+        }
+    }
+}

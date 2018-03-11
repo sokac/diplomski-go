@@ -1,0 +1,7 @@
+FROM golang
+
+RUN go get github.com/tebeka/go2xunit
+
+ADD . /go/src/fibonacci
+
+ENTRYPOINT ["/go/src/fibonacci/test.sh"]
