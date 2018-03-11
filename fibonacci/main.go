@@ -9,11 +9,17 @@ import (
 func fibonacci(n uint64) uint64 {
 	if n == 0 {
 		return 0
-	} else if n == 1 {
-		return 1
-	} else {
-		return fibonacci(n-1) + fibonacci(n-2)
 	}
+	a := uint64(0)
+	b := uint64(1)
+
+	for n > 1 {
+		tmp := a + b
+		a = b
+		b = tmp
+		n--
+	}
+	return b
 }
 
 func fibonacciHandler(w http.ResponseWriter, r *http.Request) {
