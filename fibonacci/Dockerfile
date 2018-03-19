@@ -2,6 +2,8 @@ FROM golang
 
 ADD . /go/src/fibonacci
 
-RUN cd /go/src/fibonacci && go install .
+RUN cd /go/src/fibonacci && go build .
 
-ENTRYPOINT ["/go/bin/fibonacci"]
+WORKDIR /go/src/fibonacci
+
+ENTRYPOINT ["/go/src/fibonacci/fibonacci"]
