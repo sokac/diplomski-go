@@ -17,10 +17,10 @@ func fibonacci(n uint64) uint64 {
 }
 
 func fibonacciHandler(w http.ResponseWriter, r *http.Request) {
-	n, err := strconv.ParseUint(r.URL.Query().Get("broj"), 10, 64)
+	n, err := strconv.ParseUint(r.URL.Query().Get("n"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Parametar broj mora biti prirodni broj."))
+		w.Write([]byte("Parametar n mora biti prirodni broj."))
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -32,9 +32,14 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
+func homePageHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/index.html")
+}
+
 func main() {
-	http.HandleFunc("/", fibonacciHandler)
+	http.HandleFunc("/", homePageHandler)
+	http.HandleFunc("/api/fibonacci", fibonacciHandler)
 	http.HandleFunc("/health", healthHandler)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8888", nil))
 }

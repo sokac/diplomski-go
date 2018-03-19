@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fibonacci kalkulator</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <form>
+        <p>
+            <input type="text" id="number" placeholder="Unesite broj" />
+        </p>
+        <p>
+            <input type="submit" value="Računaj" id="compute" />
+        </p>
+    </form>
+    <p>Rezultat: <strong><span id="result">0</span></p>
+    <script>
+        $('#compute').click(function(e) {
+            var that = this;
+            that.disabled = true;
+            var n = $('#number').val();
+
+            $.post(
+                '/api/fibonacci?n='+n,
+                function(r) {
+                    $('#result').text(r);
+                }
+            ).fail(function(r) {
+                $('#result').text(r.responseText);
+            }).always(function() {
+                that.disabled = false;
+            });
+            return false;
+        });
+    </script>
+</body>
+</html>

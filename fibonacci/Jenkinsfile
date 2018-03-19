@@ -6,7 +6,6 @@ pipeline {
             steps {
                 sh 'docker build -f fibonacci/Dockerfile.test -t go_test fibonacci'
                 sh 'docker run --rm go_test > tests.xml'
-                junit 'tests.xml'
             }
         }
         stage('Izgradnja slike') {
@@ -15,6 +14,22 @@ pipeline {
                     docker.withRegistry('https://docker.io', 'dockerhub') {
                         def i = docker.build("sokac/fibonacci:${BUILD_NUMBER}", '-f fibonacci/Dockerfile fibonacci/')
                         i.push()
+                    }
+                }
+            }
+        }
+        stage('Testiranje slike') {
+            steps {
+                script {
+                    docker.withRegistry('https://docker.io', 'dockerhub') {
+                        def i = docker.image("sokac/fibonacci:${BUILD_NUMBER}")
+                        i.withRun { c->
+                            sleep 1 // cekaj sekundu
+                            def ii = docker.build('sokac/fibonacci_integration', '-f fibonacci/Dockerfile.integration fibonacci/')
+                            ii.inside("--shm-size=1g --link ${c.id}:app") {
+                                sh 'cd fibonacci && CYPRESS_baseUrl=http://app:8888/ /node_modules/.bin/cypress run -r junit'
+                            }
+                        }
                     }
                 }
             }
@@ -28,6 +43,13 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            junit 'tests.xml'
+            junit 'fibonacci/test-results.xml'
         }
     }
 }
