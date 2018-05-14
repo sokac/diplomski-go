@@ -58,7 +58,6 @@ func getFreePort() (int, error) {
 	}
 	defer l.Close()
 	return l.Addr().(*net.TCPAddr).Port, nil
-
 }
 
 func (dm *DockerManager) runNewContainer(newImageID string) {

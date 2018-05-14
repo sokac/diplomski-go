@@ -30,6 +30,12 @@ func loadConfig(f string) (*Config, error) {
 		return nil, err
 	}
 	err = json.Unmarshal(fileData, c)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.Validate(); c != nil {
+		return nil, err
+	}
 
 	return c, err
 }

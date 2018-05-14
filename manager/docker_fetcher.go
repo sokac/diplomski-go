@@ -11,8 +11,6 @@ import (
 	"github.com/docker/docker/client"
 )
 
-const HTTP_TIMEOUT time.Duration = time.Second
-
 type DockerFetcher struct {
 	cli          *client.Client
 	tickInterval time.Duration
@@ -50,15 +48,6 @@ func (c *DockerFetcher) fetchLatest() {
 	}
 }
 
-func NewDockerFetcher(cli *client.Client, image string, tickInterval time.Duration) *DockerFetcher {
-	return &DockerFetcher{
-		cli:          cli,
-		tickInterval: tickInterval,
-		image:        image,
-		ch:           make(chan string, 1),
-	}
-}
-
 func (c *DockerFetcher) Run(wg *sync.WaitGroup, exit <-chan bool) {
 	c.fetchLatest()
 	tick := time.Tick(c.tickInterval)
@@ -73,5 +62,14 @@ func (c *DockerFetcher) Run(wg *sync.WaitGroup, exit <-chan bool) {
 		default:
 			time.Sleep(time.Millisecond * 50)
 		}
+	}
+}
+
+func NewDockerFetcher(cli *client.Client, image string, tickInterval time.Duration) *DockerFetcher {
+	return &DockerFetcher{
+		cli:          cli,
+		tickInterval: tickInterval,
+		image:        image,
+		ch:           make(chan string, 1),
 	}
 }
