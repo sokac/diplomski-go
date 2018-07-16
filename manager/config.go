@@ -33,7 +33,7 @@ func loadConfig(f string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := c.Validate(); c != nil {
+	if err := c.Validate(); err != nil {
 		return nil, err
 	}
 
